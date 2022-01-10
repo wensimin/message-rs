@@ -13,8 +13,10 @@ class ResourceServerConfig {
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain? {
         http
             .authorizeRequests().apply {
-                //本rs全部请求均需要client权限
-                anyRequest().hasAuthority("CLIENT")
+                // send message部分需要client权限
+                antMatchers("/message/send/**").hasAuthority("CLIENT")
+                // 其他部分user auth
+                anyRequest().authenticated()
             }.and()
             .oauth2ResourceServer()
             .jwt()
