@@ -11,7 +11,10 @@ import org.springframework.web.bind.annotation.*
 class TokenController(private val tokenDao: TokenDao) {
     @PutMapping("{id}")
     fun put(@PathVariable id: String, token: JwtAuthenticationToken) {
-        tokenDao.save(Token(id, token.name))
+        val saveToken = tokenDao.findByIdOrNull(id) ?: Token(id, token.name)
+        tokenDao.save(saveToken.apply {
+            username = token.name
+        })
     }
 
     @GetMapping

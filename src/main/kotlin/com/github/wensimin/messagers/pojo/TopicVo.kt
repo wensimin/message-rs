@@ -4,9 +4,9 @@ import javax.persistence.Column
 import javax.validation.constraints.NotEmpty
 
 class TopicVo(
-    @NotEmpty
+    @field:NotEmpty
     var id: String?,
     @Column(nullable = false)
-    @NotEmpty
+    @field:NotEmpty
     var description: String?
 )

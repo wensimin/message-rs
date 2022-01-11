@@ -5,9 +5,9 @@ import javax.persistence.*
 @Entity
 class Topic(
     @Id
-    var id: String?,
+    var id: String,
     @Column(nullable = false)
-    var description: String?,
+    var description: String,
     @ElementCollection(fetch = FetchType.EAGER)
     var registerUsers: MutableSet<String> = mutableSetOf()
 ) : Data()

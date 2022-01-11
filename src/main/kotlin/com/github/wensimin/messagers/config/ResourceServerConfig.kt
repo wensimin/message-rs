@@ -13,8 +13,8 @@ class ResourceServerConfig {
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain? {
         http
             .authorizeRequests().apply {
-                // send message部分需要client权限
-                antMatchers("/message/send/**").hasAuthority("CLIENT")
+                // client部分需要client权限
+                antMatchers("/client/**").hasAuthority("CLIENT")
                 // 其他部分user auth
                 anyRequest().authenticated()
             }.and()

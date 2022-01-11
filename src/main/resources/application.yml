@@ -29,5 +29,7 @@ logging:
   level:
     root: warn
     com.github.wensimin.messagers: debug
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
   file:
     name: log/log.log
