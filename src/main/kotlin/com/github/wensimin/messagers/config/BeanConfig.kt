@@ -2,6 +2,10 @@ package com.github.wensimin.messagers.config
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.amqp.core.Queue
+import org.springframework.amqp.rabbit.connection.ConnectionFactory
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer
+import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter
 import org.springframework.beans.factory.InjectionPoint
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -34,4 +38,11 @@ class BeanConfig {
         )
     }
 
+    /**
+     * 队列名
+     */
+    @Bean
+    fun queue(): Queue {
+        return Queue("message", true)
+    }
 }

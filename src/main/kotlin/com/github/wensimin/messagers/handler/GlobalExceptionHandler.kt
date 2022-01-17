@@ -15,7 +15,7 @@ class GlobalExceptionHandler {
     fun exception(e: Exception): ErrorResponse {
         //TODO 按未知错误处理
         e.printStackTrace()
-        return ErrorResponse(ErrorType.ERROR, e.localizedMessage)
+        return ErrorResponse(ErrorType.ERROR, e.localizedMessage ?: "未知错误")
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

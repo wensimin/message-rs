@@ -1,6 +1,7 @@
 package com.github.wensimin.messagers.pojo
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import java.io.Serializable
 import javax.validation.constraints.NotEmpty
 
 data class MessageVo(
@@ -8,9 +9,9 @@ data class MessageVo(
     var title: String?,
     @field:NotEmpty
     var body: String?,
-    var toUser: String?,
-    var toTopic: String?,
+    var toUser: String? = null,
+    var toTopic: String? = null,
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    var fromClient: String?,
-    var url: String?
-)
+    var fromClient: String? = null,
+    var url: String? = null
+) : Serializable

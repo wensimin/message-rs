@@ -5,6 +5,9 @@ import com.github.wensimin.messagers.pojo.MessageVo
 import com.github.wensimin.messagers.pojo.TopicVo
 import com.github.wensimin.messagers.service.MessageService
 import com.github.wensimin.messagers.service.TopicService
+import org.springframework.amqp.rabbit.connection.ConnectionFactory
+import org.springframework.amqp.rabbit.core.RabbitTemplate
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -29,4 +32,9 @@ class ClientController(
         messageVo.fromClient = principal.name
         messageService.sendMessage(messageVo)
     }
+
+//    @PostMapping("test")
+//    fun test(@Autowired rabbitTemplate: RabbitTemplate) {
+//        rabbitTemplate.convertAndSend("message", MessageVo("title", "body", null, null, null, null))
+//    }
 }
