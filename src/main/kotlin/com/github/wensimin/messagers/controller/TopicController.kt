@@ -12,7 +12,7 @@ class TopicController(private val topicService: TopicService) {
 
     @GetMapping
     fun getAll(token: JwtAuthenticationToken): List<TopicProjection> {
-        return topicService.findList(token.name)
+        return topicService.findAllList(token.name)
     }
 
     @PutMapping("{topic}")

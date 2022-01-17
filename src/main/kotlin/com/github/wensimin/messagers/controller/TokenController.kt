@@ -22,6 +22,11 @@ class TokenController(private val tokenDao: TokenDao) {
         return tokenDao.findByUsername(token.name)
     }
 
+    @GetMapping("{id}")
+    fun get(@PathVariable id: String): Token? {
+        return tokenDao.findByIdOrNull(id)
+    }
+
     @DeleteMapping("{id}")
     fun delete(@PathVariable id: String, token: JwtAuthenticationToken) {
         tokenDao.findByIdOrNull(id)?.let {

@@ -24,8 +24,12 @@ class TopicService(private val topicDao: TopicDao) {
         })
     }
 
-    fun findList(name: String): List<TopicProjection> {
-        return topicDao.findProjection(name)
+    /**
+     * 查询所有topic
+     * @param username 用户名,用于对照是否订阅主题
+     */
+    fun findAllList(username: String): List<TopicProjection> {
+        return topicDao.findProjection(username)
     }
 
     fun unRegister(topicId: String, name: String) {

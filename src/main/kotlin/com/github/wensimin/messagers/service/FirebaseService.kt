@@ -1,14 +1,15 @@
 package com.github.wensimin.messagers.service
 
-import com.google.api.client.http.HttpTransport
+import com.github.wensimin.messagers.config.ProxyConfigProp
+import com.github.wensimin.messagers.pojo.MessageVo
+import com.google.api.client.http.javanet.DefaultConnectionFactory
 import com.google.api.client.http.javanet.NetHttpTransport
-import com.google.auth.http.HttpTransportFactory
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
+import com.google.firebase.messaging.BatchResponse
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.messaging.Message
-import com.google.firebase.messaging.Notification
+import com.google.firebase.messaging.MulticastMessage
 import org.slf4j.Logger
 import org.springframework.stereotype.Service
 import org.springframework.util.ResourceUtils
@@ -17,38 +18,49 @@ import java.net.Proxy
 
 
 @Service
-class FirebaseService(private val logger: Logger) {
+class FirebaseService(
+    private val logger: Logger,
+    proxyConfigProp: ProxyConfigProp
+) {
     private val app: FirebaseApp
+    private val instance: FirebaseMessaging
 
     init {
-        System.setProperty("https.proxyHost", "127.0.0.1")
-        System.setProperty("https.proxyPort", "1080")
-        System.setProperty("com.google.api.client.should_use_proxy", "true")
-//        val proxy = Proxy(Proxy.Type.HTTP, InetSocketAddress(, ))
-//        val httpTransport = NetHttpTransport.Builder().setProxy(proxy).build();
+        val proxy = Proxy(Proxy.Type.SOCKS, InetSocketAddress(proxyConfigProp.host!!, proxyConfigProp.port!!))
+        val httpTransport = NetHttpTransport.Builder()
+            .setProxy(proxy)
+            .setConnectionFactory(
+                DefaultConnectionFactory(proxy)
+            ).build()
         val options = FirebaseOptions.builder()
             .setCredentials(
                 GoogleCredentials.fromStream(
                     ResourceUtils.getFile("classpath:shali-fcm-firebase-adminsdk-opn5v-18154bce89.json").inputStream()
-                )
+                ) { httpTransport }
             )
-//            .setHttpTransport(httpTransport)
+            .setConnectTimeout(5000)
+            .setReadTimeout(5000)
+            .setHttpTransport(httpTransport)
             .build()
         app = FirebaseApp.initializeApp(options)
+        instance = FirebaseMessaging.getInstance(app)
     }
 
-    fun test() {
-//        val registrationToken =
-//            "ej_w0m6mRtK-jRWSYiHPFT:APA91bFjPzRgn_RSGBqYxUVojP_N2FxqZ2pbDscM3abujeO0KlxVr5INulcrp_atMb4UpYvLuvrK1zXJQoAuFFJjcYRwd37l7H0JwcmGXF01gb9v2oDoEW9ju-SzHFWp8j7aws_-L3bj"
-        val registrationToken =
-            "eSTczUPnTaGmjsQy48Tuhb:APA91bGpopnd3YutSLS72D_qi9kqGAmSzcQ_GLyuI3ejHamp2ZpLz0hbk08XXZrspA1vk-Er4xeT-PHuh_LsZms03YlZTxnjPFzEZO3_WOSs8IiNXzW9tQTG487CUUOBxmDf2W-w-fYv"
-        val message = Message.builder()
-            .putData("title", "title").putData("body", "body")
-            .setToken(registrationToken)
-            .build()
-        val response = FirebaseMessaging.getInstance().send(message)
-        logger.debug(response)
+    /**
+     * 对多个用户发送消息
+     */
+    fun sendMultiMessage(message: MessageVo, toUsers: Collection<String>): BatchResponse {
+        val data = mutableMapOf(
+            "title" to message.title,
+            "body" to message.body,
+            "url" to message.url
+        )
+        logger.debug("send ${toUsers.size} message")
+        // 清除可选参空值
+        data.values.removeIf { it == null }
+        return instance.sendMulticast(
+            MulticastMessage.builder().addAllTokens(toUsers.toList()).putAllData(data).build()
+        )
     }
-
 
 }
