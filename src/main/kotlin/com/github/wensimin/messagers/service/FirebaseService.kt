@@ -11,8 +11,8 @@ import com.google.firebase.messaging.BatchResponse
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.MulticastMessage
 import org.slf4j.Logger
+import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Service
-import org.springframework.util.ResourceUtils
 import java.net.InetSocketAddress
 import java.net.Proxy
 
@@ -35,7 +35,7 @@ class FirebaseService(
         val options = FirebaseOptions.builder()
             .setCredentials(
                 GoogleCredentials.fromStream(
-                    ResourceUtils.getFile("classpath:shali-fcm-firebase-adminsdk-opn5v-18154bce89.json").inputStream()
+                    ClassPathResource("shali-fcm-firebase-adminsdk-opn5v-18154bce89.json").inputStream
                 ) { httpTransport }
             )
             .setConnectTimeout(5000)
