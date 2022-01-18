@@ -8,9 +8,9 @@ import com.github.wensimin.messagers.pojo.MessageVo
 import org.slf4j.Logger
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import java.lang.RuntimeException
 import java.util.*
 import javax.transaction.Transactional
+import kotlin.concurrent.thread
 
 @Service
 class MessageService(
@@ -41,10 +41,15 @@ class MessageService(
         val tokens: List<String> = tokenDao.findByUsernameIn(targetUsers).map {
             it.id!!
         }
-        firebaseService.sendMultiMessage(messageVo, tokens)
+        val responses = firebaseService.sendMultiMessage(messageVo, tokens)
+        //FCM返回的失败信息中不含具体token,可能导致定位问题token困难,目前先不处理发送失败的部分
+        logger.info("send message fail count ${responses.failureCount}")
         logger.info("send message to ${targetUsers.size} user ${tokens.size} token title ${messageVo.title}")
         //save message log性质
-        saveMessage(messageVo, targetUsers)
+        // 目前使用jpa save 数据量上来会有性能问题
+        thread {
+            saveMessage(messageVo, targetUsers)
+        }.run()
     }
 
     private fun saveMessage(messageVo: MessageVo, targetUsers: MutableSet<String>) {

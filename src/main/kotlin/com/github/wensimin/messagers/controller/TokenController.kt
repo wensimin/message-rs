@@ -5,15 +5,16 @@ import com.github.wensimin.messagers.entity.Token
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.web.bind.annotation.*
+import javax.validation.Valid
 
 @RestController
 @RequestMapping("token")
 class TokenController(private val tokenDao: TokenDao) {
-    @PutMapping("{id}")
-    fun put(@PathVariable id: String, token: JwtAuthenticationToken) {
-        val saveToken = tokenDao.findByIdOrNull(id) ?: Token(id, token.name)
-        tokenDao.save(saveToken.apply {
-            username = token.name
+
+    @PutMapping
+    fun put(@Valid @RequestBody token: Token, user: JwtAuthenticationToken) {
+        tokenDao.save(token.apply {
+            username = user.name
         })
     }
 

@@ -1,5 +1,7 @@
 package com.github.wensimin.messagers.mq
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.wensimin.messagers.pojo.MessageVo
 import com.github.wensimin.messagers.service.MessageService
 import org.slf4j.Logger
@@ -12,18 +14,19 @@ import org.springframework.stereotype.Component
 @RabbitListener(queues = ["message"])
 class MessageReceiver(
     private val messageService: MessageService,
+    private val objectMapper: ObjectMapper,
     private val logger: Logger
 ) {
 
     @RabbitHandler
-    fun process(message: MessageVo) {
+    fun process(message: String) {
         logger.info("rabbitmq Receiver  : $message")
         try {
-            messageService.sendMessage(message)
+            val messageVo: MessageVo = objectMapper.readValue(message)
+            messageService.sendMessage(messageVo)
         } catch (e: Exception) {
-            e.printStackTrace()
-            //TODO 分开处理错误,归为send before after
-            logger.error("处理message错误 ${e.message} $message")
+            //目前消息成功与否都进行消费
+            logger.error("处理message错误 ${e.stackTraceToString()} $message")
         }
     }
 }
