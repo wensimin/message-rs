@@ -5,12 +5,12 @@ import com.github.wensimin.messagers.dao.TokenDao
 import com.github.wensimin.messagers.dao.TopicDao
 import com.github.wensimin.messagers.entity.Message
 import com.github.wensimin.messagers.pojo.MessageVo
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.util.*
-import javax.transaction.Transactional
-import kotlin.concurrent.thread
 
 @Service
 class MessageService(
@@ -20,7 +20,7 @@ class MessageService(
     private val logger: Logger,
     private val messageDao: MessageDao
 ) {
-    @Transactional
+
     fun sendMessage(messageVo: MessageVo) {
         val targetUsers = mutableSetOf<String>()
         when {
@@ -47,9 +47,11 @@ class MessageService(
         logger.info("send message to ${targetUsers.size} user ${tokens.size} token title ${messageVo.title}")
         //save message log性质
         // 目前使用jpa save 数据量上来会有性能问题
-        thread {
-            saveMessage(messageVo, targetUsers)
-        }.run()
+        runBlocking {
+            launch {
+                saveMessage(messageVo, targetUsers)
+            }
+        }
     }
 
     private fun saveMessage(messageVo: MessageVo, targetUsers: MutableSet<String>) {
