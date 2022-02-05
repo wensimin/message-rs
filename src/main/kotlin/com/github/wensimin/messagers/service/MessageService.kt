@@ -5,8 +5,6 @@ import com.github.wensimin.messagers.dao.TokenDao
 import com.github.wensimin.messagers.dao.TopicDao
 import com.github.wensimin.messagers.entity.Message
 import com.github.wensimin.messagers.pojo.MessageVo
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -41,17 +39,13 @@ class MessageService(
         val tokens: List<String> = tokenDao.findByUsernameIn(targetUsers).map {
             it.id!!
         }
-        val responses = firebaseService.sendMultiMessage(messageVo, tokens)
+        val responses = firebaseService.sendMultiMessage(messageVo, tokens, messageVo.priority)
         //FCM返回的失败信息中不含具体token,可能导致定位问题token困难,目前先不处理发送失败的部分
         logger.info("send message fail count ${responses.failureCount}")
         logger.info("send message to ${targetUsers.size} user ${tokens.size} token title ${messageVo.title}")
         //save message log性质
         // 目前使用jpa save 数据量上来会有性能问题
-        runBlocking {
-            launch {
-                saveMessage(messageVo, targetUsers)
-            }
-        }
+        saveMessage(messageVo, targetUsers)
     }
 
     private fun saveMessage(messageVo: MessageVo, targetUsers: MutableSet<String>) {

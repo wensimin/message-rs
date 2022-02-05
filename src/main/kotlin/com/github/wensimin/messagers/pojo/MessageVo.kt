@@ -1,6 +1,6 @@
 package com.github.wensimin.messagers.pojo
 
-import java.io.Serializable
+import com.google.firebase.messaging.AndroidConfig
 import javax.validation.constraints.NotEmpty
 
 /**
@@ -15,5 +15,6 @@ data class MessageVo(
     var toUser: String? = null,
     var toTopic: String? = null,
     var fromClient: String? = null,
-    var url: String? = null
-) : Serializable
+    var url: String? = null,
+    val priority: AndroidConfig.Priority = AndroidConfig.Priority.NORMAL
+)

@@ -7,6 +7,7 @@ import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
+import com.google.firebase.messaging.AndroidConfig
 import com.google.firebase.messaging.BatchResponse
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.MulticastMessage
@@ -49,17 +50,27 @@ class FirebaseService(
     /**
      * 对多个用户发送消息
      */
-    fun sendMultiMessage(message: MessageVo, toUsers: Collection<String>): BatchResponse {
+    fun sendMultiMessage(
+        message: MessageVo,
+        toUsers: Collection<String>,
+        priority: AndroidConfig.Priority = AndroidConfig.Priority.NORMAL
+    ): BatchResponse {
         val data = mutableMapOf(
             "title" to message.title,
             "body" to message.body,
             "url" to message.url
         )
         logger.debug("send ${toUsers.size} message")
+        // 设置消息重要程度
+        val androidConfig = AndroidConfig.builder().setPriority(priority).build()
         // 清除可选参空值
         data.values.removeIf { it == null }
         return instance.sendMulticast(
-            MulticastMessage.builder().addAllTokens(toUsers.toList()).putAllData(data).build()
+            MulticastMessage.builder()
+                .addAllTokens(toUsers.toList())
+                .setAndroidConfig(androidConfig)
+                .putAllData(data)
+                .build()
         )
     }
 
