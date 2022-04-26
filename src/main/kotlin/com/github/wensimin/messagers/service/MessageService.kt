@@ -7,6 +7,8 @@ import com.github.wensimin.messagers.entity.Message
 import com.github.wensimin.messagers.pojo.MessageVo
 import org.slf4j.Logger
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.retry.annotation.Recover
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -18,7 +20,13 @@ class MessageService(
     private val logger: Logger,
     private val messageDao: MessageDao
 ) {
+    // 重试后的处理方法,目前仅抛出
+    @Recover
+    fun recoverMessage(throwable: Throwable, messageVo: MessageVo) {
+        throw throwable
+    }
 
+    @Retryable
     fun sendMessage(messageVo: MessageVo) {
         val targetUsers = mutableSetOf<String>()
         when {
