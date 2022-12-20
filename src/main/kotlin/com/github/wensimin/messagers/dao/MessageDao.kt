@@ -7,4 +7,5 @@ interface MessageDao : JpaRepository<Message, String> {
     fun findByToUser(user: String): List<Message>
     fun findByToTopic(topic: String): List<Message>
     fun findByFromClient(client: String): List<Message>
+    fun findByError(b: Boolean): List<Message>
 }

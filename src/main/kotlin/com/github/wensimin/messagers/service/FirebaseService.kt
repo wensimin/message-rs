@@ -1,7 +1,6 @@
 package com.github.wensimin.messagers.service
 
 import com.github.wensimin.messagers.config.ProxyConfigProp
-import com.github.wensimin.messagers.pojo.MessageVo
 import com.google.api.client.http.javanet.DefaultConnectionFactory
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.auth.oauth2.GoogleCredentials
@@ -51,14 +50,14 @@ class FirebaseService(
      * 对多个用户发送消息
      */
     fun sendMultiMessage(
-        message: MessageVo,
+        title: String?, body: String?, url: String?,
         toUsers: Collection<String>,
         priority: AndroidConfig.Priority = AndroidConfig.Priority.NORMAL
     ): BatchResponse {
         val data = mutableMapOf(
-            "title" to message.title,
-            "body" to message.body,
-            "url" to message.url
+            "title" to title,
+            "body" to body,
+            "url" to url
         )
         logger.debug("send ${toUsers.size} message")
         // 设置消息重要程度

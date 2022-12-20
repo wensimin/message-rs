@@ -1,8 +1,8 @@
 package com.github.wensimin.messagers.entity
 
 import javax.persistence.Column
-import javax.persistence.Id
 import javax.persistence.Entity
+import javax.persistence.Id
 
 @Entity
 class Message(
@@ -17,5 +17,7 @@ class Message(
     var toTopic: String?,
     @Column(nullable = false)
     var fromClient: String,
-    var url: String?
+    var url: String?,
+    @Column(nullable = false)
+    var error: Boolean = false
 ) : Data()
